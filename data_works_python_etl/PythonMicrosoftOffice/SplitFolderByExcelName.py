@@ -62,7 +62,10 @@ def moveFileToFolder(newfolderpath,movefilepathlist):
     '''
     if newfolderpath and movefilepathlist:
         getNewFolderPath,getMoveFilePathList = newfolderpath,movefilepathlist
-        os.mkdir(getNewFolderPath)  # 创建文件夹
+        if os.path.exists(getNewFolderPath):
+            pass
+        else:
+            os.mkdir(getNewFolderPath)  # 创建文件夹
         for filenamepath in getMoveFilePathList:
             try:
                 shutil.move(filenamepath,getNewFolderPath)  #移动文件到指定目录下
@@ -108,6 +111,6 @@ if __name__ == '__main__':
     # main(sourcefolderpath, rule,prefixlist = prefixlist)
     ######包含匹配归类
     rule = 2  # 归类规则 ，1：前缀归类 ，2：包含归类
-    containinfolist = ['ssj','gqf','in','上海'] #文件名中包含数组中的内容，将被归为一类
+    containinfolist = ['ssj','gqf','in','上海','out'] #文件名中包含数组中的内容，将被归为一类
     # #iscasesensitive = True #默认不区分大小写，如果要区分大小写，需要释放注释
     main(sourcefolderpath,rule,containinfolist = containinfolist)
