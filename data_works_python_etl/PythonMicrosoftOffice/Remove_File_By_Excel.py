@@ -1,5 +1,8 @@
 import os,sys,xlrd
 import shutil
+import progressbar
+#import time
+progress = progressbar.ProgressBar()
 def read_excel(excel_path,sheet = 0):
     try:
         data = xlrd.open_workbook(excel_path)
@@ -17,9 +20,12 @@ def remove_file(excel_list,folder_path):
         pass
     else:
         os.mkdir(removeFolder)
-    for foldername in excel_list:
-        shutil.move(folder_path+'\\'+foldername, removeFolder+'\\'+foldername)
-
+    for foldername in progress(excel_list):
+        #time.sleep(0.2)
+        if(os.path.exists(str(folder_path+'\\'+str(foldername)))):
+            shutil.move(str(folder_path+'\\'+str(foldername)), str(removeFolder+'\\'+str(foldername)))
+        else:
+            pass
 if len(sys.argv) < 3 or len(sys.argv) > 3:
     print(len(sys.argv))
     print(str(sys.argv))
@@ -30,7 +36,7 @@ else:
     getExcelList = read_excel(excel_path)
     remove_file(getExcelList, root_path)
 # if __name__ == '__main__':
-#    excel_path = 'C:\\Users\\Administrator\\Desktop\\1119公司资料拆分需求-gqf\\公司列表.xlsx'
-#    folder_path = 'C:\\Users\\Administrator\\Desktop\\1119公司资料拆分需求-gqf\\'
+#    excel_path = 'C:\\Users\\Administrator\\Desktop\\1119公司资料拆分需求-gqf - 副本\\公司列表.xlsx'
+#    folder_path = 'C:\\Users\\Administrator\\Desktop\\1119公司资料拆分需求-gqf - 副本\\'
 #    getExcelList = read_excel(excel_path)
 #    remove_file(getExcelList,folder_path)
