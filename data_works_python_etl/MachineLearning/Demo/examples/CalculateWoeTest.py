@@ -79,16 +79,14 @@ def Discrete_Value(df):
     df['NumberOfDependents'] = WOE_Convert(df['NumberOfDependents'],[0,1,2],[0,1,2])
 def cal_woe(df):
     groups = df.shape[0] #分箱字段
-    # 对于统计项为0的actual_0和actual_1赋值为1
-    df.loc[df['actual_0'] == 0, 'actual_0'] = 1
-    df.loc[df['actual_1'] == 0, 'actual_1'] = 1
-    all_0 = df['actual_0'].sum()
-    all_1 = df['actual_1'].sum()
+    all_0 = df['bad'].sum()
+    all_1 = df['good'].sum()
     for i in range(groups):
-        tmp = ((df.loc[i, 'actual_1'] * 1.0 / all_1) - (df.loc[i, 'actual_0'] * 1.0 / all_0)) * \
-              np.log((df.loc[i, 'actual_1'] * 1.0 / all_1) / (df.loc[i, 'actual_0'] * 1.0 / all_0))
-        groups['woe'] = tmp
-    return groups
+        tmpWOE = np.log((df.loc[i, 'good'] * 1.0 / all_1) / (df.loc[i, 'bad'] * 1.0 / all_0))
+        tmpIV = ((df.loc[i, 'good'] * 1.0 / all_1) - (df.loc[i, 'bad'] * 1.0 / all_0)) * tmpWOE
+        df.loc[i, 'woe'] = tmpWOE
+        df.loc[i, 'iv'] = tmpIV
+    return df
 
 def split_feature_box(df):
     RevolvingUtilizationOfUnsecuredLines_Bins = [0, 0.03, 0.12, 0.40, 0.80]
@@ -100,7 +98,7 @@ def split_feature_box(df):
         good,bad = list(df[df['categories'].isin([i])].groupby(['categories','SeriousDlqin2yrs']).size())
         tmp = [i,good,bad]
         df_Statistics.append(tmp)
-    return pd.DataFrame(df_Statistics,columns=['Sep_Point','bad','good'])
+    return pd.DataFrame(df_Statistics,columns=['Sep_Point','good','bad'])
     #print(getDistinctCategories)
     #for i in df['categories']:
 if __name__ == '__main__':
@@ -108,10 +106,14 @@ if __name__ == '__main__':
     # print(df_train)
     df_train = outlier_check(df_train,'NumberOfDependents')#数据预处理
     #check_na(df_train)  #查看数据预处理后的数量
-    df_train, df_test = split_sample(df_train) # 数据拆分 拆分成“检验数据”和“测试数据”
+    #df_train, df_test = split_sample(df_train) # 数据拆分 拆分成“检验数据”和“测试数据”
     #print(df_train)
     df_train_statistics = split_feature_box(df_train)
-    print(cal_woe(df_train_statistics))
+    df_train_statistics = cal_woe(df_train_statistics)
+    print(df_train_statistics)
+    # print(df_train_statistics.loc[0, 'bad'])
+    # print(df_train_statistics['bad'].sum())
+    #print(cal_woe(df_train_statistics))
     #WOE数据离散化 检验数分箱
     #print(df_train)
     #print(df_train)

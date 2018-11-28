@@ -1,5 +1,6 @@
-import os
-import xlwt
+import os,sys
+import xlsxwriter as xlsxwriter
+from progressbar import *
 def getFileName(rootPath):
     if os.path.exists(rootPath):
         # for root, dirs, files in os.walk(rootPath, topdown=False):
@@ -11,17 +12,34 @@ def getFileName(rootPath):
         #     #     print(os.path.join(root, name))
         #     # for name in dirs:
         #     #     print( name)
-        return os.listdir(rootPath)
+        if 'data.xls' in os.listdir(rootPath):
+            get_filename_list = os.listdir(rootPath)
+            get_filename_list.remove('data.xls')
+        else:
+            get_filename_list = os.listdir(rootPath)
+        return get_filename_list
 def copyNameToExcel(FileNameList,rootPath):
-    file = xlwt.Workbook(encoding='utf-8')
-    # 指定file以utf-8的格式打开
-    table = file.add_sheet('data')
+    n = 0
+    progress = ProgressBar()
+    workbook = xlsxwriter.Workbook(rootPath+"\\"+'data.xls')
+    worksheet = workbook.add_worksheet('文件名')
     if FileNameList:
-        for FileName in FileNameList:
-            table.write(FileName,'123')
-    file.save(rootPath+r"\\"+'data.xls')
+        for FileName in progress(FileNameList):
+            worksheet.write(n, 0, FileName)
+            n += 1
+    workbook.close()
 
-if __name__=='__main__':
-    rootPath = 'C:\\Users\\lenovo\\Desktop\\test'
-    fileNameList = getFileName(rootPath)
-    copyNameToExcel(fileNameList,rootPath)
+if len(sys.argv) < 2 or len(sys.argv) > 2:
+    print(len(sys.argv))
+    print(str(sys.argv))
+    print("传入参数有问题，需要两条参数（根路径）！")
+    sys.exit()
+else:
+    root_path = sys.argv[1]
+    fileNameList = getFileName(root_path)
+    copyNameToExcel(fileNameList, root_path)
+
+# if __name__=='__main__':
+#     rootPath = 'C:\\Users\\Administrator\\Desktop\\test'
+#     fileNameList = getFileName(rootPath)
+#     copyNameToExcel(fileNameList,rootPath)
