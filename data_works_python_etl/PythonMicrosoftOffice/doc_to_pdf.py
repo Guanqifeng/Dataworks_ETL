@@ -49,11 +49,13 @@ def doc2pdf(doc_path, pdf_path):
 #     if pathExists(doc_path, ftp_path):
 #         doc2pdf(doc_path, ftp_path)
 if __name__=='__main__':
-    starTime = time
+    starTime = time.time()
     doc_path = "C:\\Users\\Administrator\\Desktop\\test_file\\协议"
     ftp_path = "C:\\Users\\Administrator\\Desktop\\test_file\\协议PDF"
     if pathExists(doc_path, ftp_path):
+        print('StartTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
         doc2pdf(doc_path, ftp_path)
+        print('EndTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+        print("共耗时：" + str(time.time() - starTime))
     else:
         print("Word存储路径："+doc_path+" 不存在，文件不进行转换！")
-    endTime = time
