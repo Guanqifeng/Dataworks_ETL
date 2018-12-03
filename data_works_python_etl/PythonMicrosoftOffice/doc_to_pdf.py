@@ -39,23 +39,29 @@ def doc2pdf(doc_path, pdf_path):
     except Exception as e:
         print("Doc To Pdf Error"+str(e))
 
-# if len(sys.argv) < 3 or len(sys.argv) > 3:
-#     print(len(sys.argv))
-#     print(str(sys.argv))
-#     print("传入参数有问题，需要两条参数（Excel文件路径 与 根目录）！")
-#     sys.exit()
-# else:
-#     doc_path,ftp_path = sys.argv[1],sys.argv[2]
-#     if pathExists(doc_path, ftp_path):
-#         doc2pdf(doc_path, ftp_path)
-if __name__=='__main__':
-    starTime = time.time()
-    doc_path = "C:\\Users\\Administrator\\Desktop\\test_file\\协议"
-    ftp_path = "C:\\Users\\Administrator\\Desktop\\test_file\\协议PDF"
+if len(sys.argv) < 3 or len(sys.argv) > 3:
+    print(len(sys.argv))
+    print(str(sys.argv))
+    print("传入参数有问题，需要两条参数（Excel文件路径 与 根目录）！")
+    sys.exit()
+else:
+    doc_path,ftp_path = sys.argv[1],sys.argv[2]
     if pathExists(doc_path, ftp_path):
+        starTime = time.time()
         print('StartTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
         doc2pdf(doc_path, ftp_path)
         print('EndTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
         print("共耗时：" + str(time.time() - starTime))
     else:
         print("Word存储路径："+doc_path+" 不存在，文件不进行转换！")
+# if __name__=='__main__':
+#     starTime = time.time()
+#     doc_path = "C:\\Users\\Administrator\\Desktop\\协议\\协议"
+#     ftp_path = "C:\\Users\\Administrator\\Desktop\\协议\\协议PDF"
+#     if pathExists(doc_path, ftp_path):
+#         print('StartTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+#         doc2pdf(doc_path, ftp_path)
+#         print('EndTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+#         print("共耗时：" + str(time.time() - starTime))
+#     else:
+#         print("Word存储路径："+doc_path+" 不存在，文件不进行转换！")

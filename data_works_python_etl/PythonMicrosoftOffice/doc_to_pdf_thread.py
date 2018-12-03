@@ -34,6 +34,7 @@ def doc2pdf(doc_file_path, pdf_file_path):
         worddoc.SaveAs(pdf_file_path, FileFormat=17)
         # 关闭
         worddoc.Close()
+        del worddoc
     except Exception as e:
         print(str(e))
     finally:
@@ -52,6 +53,7 @@ def isDocFile(doc_name):
 class myThread(threading.Thread):   #继承父类threading.Thread
     def __init__(self, threadID, name, counter):
         threading.Thread.__init__(self)
+
         self.threadID = threadID
         self.name = name
         self.counter = counter
@@ -59,15 +61,27 @@ class myThread(threading.Thread):   #继承父类threading.Thread
         #doc2pdf(self.counter[0],self.counter[1])
         doc2pdf(self.counter[0],self.counter[1])
 
-def getThreadRecursion(num,realnum,listobj):
 
-    if num == 1 or realnum - num == 20:
-        myThread(num-1, 'Thread'+str(num-1), listobj[num-1]).start()
+
+def getThreadRecursion(num,realnum,listobj,threads):
+
+    if num == 1 or realnum - num == 100:
+        thread_o = myThread(num-1, 'Thread'+str(num-1), listobj[num-1])
+        threads.append(thread_o)
+        thread_o.start()
         return True
     else:
         num -= 1
-        myThread(num,'Thread'+str(num),listobj[num]).start()
-        getThreadRecursion(num, realnum, listobj)
+        thread_o = myThread(num,'Thread'+str(num),listobj[num])
+        threads.append(thread_o)
+        thread_o.start()
+        getThreadRecursion(num, realnum, listobj,threads)
+    return  threads
+
+def wait_for_complete(threads):
+    for item in threads:
+        if item.isAlive():
+            item.join()
 
 def main(doc_path, pdf_path):
     starTime = time.time()
@@ -76,17 +90,25 @@ def main(doc_path, pdf_path):
         getFileSet = getDocPathOfFileName(doc_path)
         file_path_list = [(doc_path+"\\"+str(filename),pdf_path+"\\"+str(filename.split(".")[0])+".pdf") for filename in getFileSet if isDocFile(filename)]
         #pdf_file_path_list = [pdf_path+"\\"+str(filename).split('.')[0]+'.pdf' for filename in getFileSet if isDocFile(filename)]
-        try:
-            fileNums = len(file_path_list)
-            while fileNums >= 0:
-                getThreadRecursion(fileNums, fileNums, file_path_list)
-                fileNums -= 21
-        except:
-            print("Error: unable to start thread")
+        # try:
+        #     fileNums = len(file_path_list)
+        #     while fileNums >= 0:
+        #         threads = []
+        #         get_threads = getThreadRecursion(fileNums, fileNums, file_path_list,threads)
+        #         wait_for_complete(get_threads)
+        #         fileNums -= 21
+        # except:
+        #     print("Error: unable to start thread")
+        fileNums = len(file_path_list)
+        while fileNums >= 0:
+            threads = []
+            get_threads = getThreadRecursion(fileNums, fileNums, file_path_list, threads)
+            wait_for_complete(get_threads)
+            fileNums -= 101
     else:
         print("Word存储路径："+doc_path+" 不存在，文件不进行转换！")
     print('EndTime:' + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
-    print("共耗时：" + str(time.time() - starTime))
+    print('共耗时:' + str(time.time() - starTime))
 # if len(sys.argv) < 3 or len(sys.argv) > 3:
 #     print(len(sys.argv))
 #     print(str(sys.argv))
