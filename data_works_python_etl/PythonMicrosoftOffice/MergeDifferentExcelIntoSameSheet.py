@@ -2,10 +2,12 @@ import glob
 import xlrd
 import xlwt
 import os
+from tqdm import tqdm
 
 # 待搜索的所有目录文件夹
 _list_of_all_folders = []
 _list_of_all_files = []
+
 
 def get_all_sub_folder(file_paths, sub_folder_level=0):
     """
@@ -61,7 +63,33 @@ def search_file(file_path, key_name, end_with='.xls'):
         print("There is an Exception :"+str(e))
 
 
-# def create_target_file():
+def merge_into_target_file(list_of_search, target_file_path, target_sheet_name, des_sheet_name):
+    try:
+        counter = 0
+        row_counter = 0
+        workbook = xlwt.Workbook(encoding='utf-8')
+        # 创建sheet
+        data_sheet = workbook.add_sheet(target_sheet_name)
+        # 创建输出格式
+        text_style = xlwt.XFStyle()
+        for source_file in tqdm(list_of_search):
+            # print(source_file)
+
+            data = xlrd.open_workbook(source_file)
+            table = data.sheet_by_name(des_sheet_name)
+            for row_num in range(table.nrows)[counter:]:
+                if row_counter == 0:
+                    data_sheet.write(row_counter, 0, 'source_file', text_style)
+                else:
+                    data_sheet.write(row_counter, 0, source_file, text_style)
+                for cell_num in range(len(table.row_values(row_num))):
+                    # print(str(row_num) + ' ' + str(cell_num))
+                    data_sheet.write(row_counter, cell_num+1, str(table.cell_value(row_num, cell_num)), text_style)
+                row_counter += 1
+            counter = 1
+        workbook.save(target_file_path)
+    except Exception as e:
+        print("Exception: "+str(e))
 
 
 def main():
@@ -81,7 +109,7 @@ def main():
     key_name = input(r"请输入关键内容，在上面范围内，查找包含该内容的文件：")
     end_with_type = input(r"当前默认查找.xls结尾的文件，是否需要修改（Y/N）：")
     if end_with_type.upper() == "Y":
-        end_with = input(r"请输入你想要的文本类型（即:以什么结尾的文件，例如.txt）")
+        end_with = input(r"请输入你想要的文本类型（即:以什么结尾的文件，例如.txt或.txt*）")
     else:
         end_with = '.xls'
     for folder_path in _list_of_all_folders:
@@ -90,9 +118,4 @@ def main():
 
 
 if __name__ == '__main__':
-
-    # print(search_file("C:\\test", "get", ".txt"))
-    # print(os.listdir("C:\\test"))
-    # get_all_sub_folder(["C:\\test"], 3)
-    # print(_list_of_all_folders)
-    main()
+    merge_into_target_file(search_file('c:\\test', 'get', '.xls*'), 'c:\\test\\target.xls', 'test', 'test')
